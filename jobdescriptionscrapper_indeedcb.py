@@ -40,7 +40,7 @@ class indeedScraper():
     except:
       return ''
 
-  def extract_company_job_posting_from_result(soup):
+  def extract_company_job_posting_from_result(soup, URL):
     companyJobPosting = []
     for div in soup.find_all(name="div", attrs={"id": "applyButtonLinkContainer"}):
       for a in div.find_all(name="a", attrs={"role": "link"}):
@@ -48,15 +48,15 @@ class indeedScraper():
     try:
       return companyJobPosting[0]
     except:
-      return ''
+      return URL
 
   def extract_job_policy_from_result(soup):
     jobPolicy = []
-    for div in soup.find_all(name="div", attrs={"class": "jobsearch-JobDescriptionSection-sectionItem"}):
+    for div in soup.find_all(name="div", attrs={"class": "jobsearch-DesktopStickyContainer-subtitle"}):
       for a in div.find_all(name="div"):
         jobPolicy.append(a.text.strip())
     try:
-      return jobPolicy[1]
+      return ' | '.join(jobPolicy[-2:])
     except:
       return ''
 
@@ -69,7 +69,10 @@ class indeedScraper():
     cache = list(dict.fromkeys(fullJD))
     for i in cache:
       if i != "" and fullJDString.find(i) < 0:
-        fullJDString = fullJDString + "\n\n" + i
+        if i.isupper() or i.find(':') > 0:
+          fullJDString = fullJDString + "\n\n" + i
+        else:
+          fullJDString = fullJDString + "\n" + i
     return fullJDString
 
   def extract_job_poster_and_age_from_result(soup):
@@ -155,7 +158,7 @@ if __name__ == '__main__':
   if JDLoc.lower() == 'yes':
     jobTitle = indeedScraper.extract_job_title_from_result(JDsoup)
     jobLocation = indeedScraper.extract_job_location_from_result(JDsoup)
-    refUrl = indeedScraper.extract_company_job_posting_from_result(JDsoup)
+    refUrl = indeedScraper.extract_company_job_posting_from_result(JDsoup, URL)
     jobPolicy = indeedScraper.extract_job_policy_from_result(JDsoup)
     JD = indeedScraper.extract_full_jd_from_result(JDsoup)
     footer = indeedScraper.extract_job_poster_and_age_from_result(JDsoup)
