@@ -1,4 +1,4 @@
-# _"I saw an ad for burial plots, and I thought… "That's the last thing I need!"_
+# ReadME
 
 Create a virtual environment
 ```shell
